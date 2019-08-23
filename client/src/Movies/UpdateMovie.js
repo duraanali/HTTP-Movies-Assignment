@@ -1,38 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import "../index.css"
-const initialmovie = {
-    title: '',
-    Director: '',
-    Metascore: '',
-};
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 
 const UpdateMovie = props => {
-    const [movie, setMovie] = useState(initialmovie);
+    const [movies, setMovies] = useState({ title: "", director: "", metascore: "" });
 
     useEffect(() => {
         const id = props.match.params.id;
-        const movieInArr = props.movies.find(movie => `${movie.id}` === id);
-        if (movieInArr) setMovie(movieInArr);
+        const itemInArr = props.movies.find(movie => `${movie.id}` === id);
+        if (itemInArr) setMovies(itemInArr);
     }, [props.movies, props.match.params.id]);
 
     const changeHandler = ev => {
         ev.persist();
         let value = ev.target.value;
 
-        setMovie({
-            ...movie,
+        setMovies({
+            ...movies,
             [ev.target.name]: value
         });
     };
 
+
+
     const handleSubmit = e => {
         e.preventDefault();
         axios
-            .put(`http://localhost:5000/api/movies/${movie.id}`, movie)
+            .put(`http://localhost:5000/api/movies/${props.match.params.id}`, movies)
             .then(res => {
-                console.log(res);
-                setMovie(initialmovie);
+                props.history.push('/');
+                setMovies({ title: "", director: "", metascore: "" });
                 props.updatemovies(res.data);
 
             })
@@ -41,39 +38,44 @@ const UpdateMovie = props => {
 
     return (
         <div>
-            <h2>Update movie</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    name="name"
-                    onChange={changeHandler}
-                    placeholder="name"
-                    value={movie.title}
-                />
-                <div className="baseline" />
 
-                <input
-                    type="number"
-                    name="price"
-                    onChange={changeHandler}
-                    placeholder="Price"
-                    value={movie.Director}
-                />
-                <div className="baseline" />
+            <div className="save-wrapper">
+                <div className="quotes-form">
+                    <h2>Update movies</h2>
+                    <form onSubmit={handleSubmit}>
+                        <input
+                            type="text"
+                            name="title"
+                            placeholder="title"
+                            onChange={changeHandler}
+                            value={movies.title}
+                        />
+                        <input
+                            type="text"
+                            name="director"
+                            placeholder="director"
+                            onChange={changeHandler}
+                            value={movies.director}
+                        />
+                        <input
+                            type="text"
+                            name="metascore"
+                            placeholder="metascore"
+                            onChange={changeHandler}
+                            value={movies.metascore}
+                        />
 
-                <input
-                    type="string"
-                    name="imageUrl"
-                    onChange={changeHandler}
-                    placeholder="Image"
-                    value={movie.Metascore}
-                />
+                        <button className="quotes-btn" type="submit">
+                            Update Movie
+          </button>
+                    </form>
+                </div>
 
 
-                <button className="md-button form-button">Update</button>
-            </form>
+            </div>
         </div>
+
     );
-};
+}
 
 export default UpdateMovie;
